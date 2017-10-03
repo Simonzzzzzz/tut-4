@@ -1,5 +1,5 @@
-// Student name :
-// Student ID   :
+// Student name :	ZHOU Zhenghao	
+// Student ID   :	54381018
 
 // Submission deadline : Sunday, 8 Oct 2017, 11pm
 // Upload your .cpp file via Canvas
@@ -77,7 +77,25 @@ void readTelList(const string& filename, telRec*& telList, int& n)
 
 	string line;
 	getline(infile, line);  // consume the '\n' after the value of n
-
+	int num;
+	int length=0;
+	for(int i=0;i<n;i++){
+		getline(infile,line);
+		while(line[num]!='\n'){
+			length++;
+			num++;
+		}
+		num=0;
+		while(line[num]!='\n'){
+			if(line[num]==','){
+				break;
+			}
+			num++;
+		}
+		telList[i].name=line.substr(0,num);
+		telList[i].tel=line.substr(num+2,length);
+	}
+	
 
 	
 	// Your codes
@@ -108,7 +126,20 @@ void readChatGroup(const string& filename, chatGroup*& groupList, int& g)
 		exit(0);
 	}
 
+	string temp;	
+	infile >> temp >> g;
+	groupList = new chatGroup[g];
+	string line;
+	getline(infile,line);
 
+	for (int i=0;i<g;i++){
+		getline(infile,line);
+		infile >> groupList[i].groupName >>groupList[i].size;
+		getline(infile,line);
+		for(int j=0;j<groupList[i].size;j++){
+			getline(infile,line);
+		}
+	}
 	// Your codes
 
 }
@@ -123,8 +154,21 @@ const string& getNameByTel(const telRec *telList, int n, const string& tel)
 	// the returned string object.
 
 	// Use binary search to find the telRec
-
-
+	int a=0;
+	int b=n-1;
+	int c=(a+b)/2;
+	while(telList[c].tel!=tel){
+		if(telList[c].tel>tel){
+			b=c;
+			c=(a+b)/2;
+		}
+		else
+			a=c;
+			c=(a+b)/2;
+	}
+	if(telList[c].tel==tel){
+		return telList[c].tel;
+	}
 
 	// Your codes
 
@@ -144,8 +188,27 @@ void printChatGroupByName(const chatGroup *groupList, int g, string gname, const
 	//    Chat group : group_name not found
 	
 	// Use binary search to find the group
-
-
+	int a=0;
+	int b=g-1;
+	int c=(a+b)/2;
+	while (groupList[c].groupName!=gname){
+		if (groupList[c].groupName<gname){
+			a=c;
+			c=(a+b)/2;
+		}
+		else
+			b=c;
+			c=(a+b)/2;
+	}
+	if (groupList[c].groupName==gname){
+		cout<<"Chat group : "<<groupList[c].groupName<<endl;
+		cout<<"Number of members : "<<groupList[c].size<<endl;
+		for (int i=0;i<groupList[c].size;i++){
+			cout<<getNameByTel(telList, n, groupList[c].member[i])<<", "<<groupList[c].menber[i]<<endl;
+		}
+	}
+	else 
+		cout << gname<<" not found"<<endl;
 
 	// Your codes
 }
