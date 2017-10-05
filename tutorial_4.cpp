@@ -77,23 +77,20 @@ void readTelList(const string& filename, telRec*& telList, int& n)
 
 	string line;
 	getline(infile, line);  // consume the '\n' after the value of n
+	
 	int num;
 	int length=0;
-	for(int i=0;i<n;i++){
-		getline(infile,line);
-		while(line[num]!='\n'){
-			length++;
+	for (int i = 0; i < n; i++) {
+		getline(infile, line);
+		length = line.length();
+		for (int j = 0; j < length; j++) {
 			num++;
-		}
-		num=0;
-		while(line[num]!='\n'){
-			if(line[num]==','){
+			if (line[j] == ',') {
 				break;
 			}
-			num++;
 		}
-		telList[i].name=line.substr(0,num);
-		telList[i].tel=line.substr(num+2,length);
+		telList[i].name = line.substr(0, num);
+		telList[i].tel = line.substr(num + 2, length);
 	}
 	
 
@@ -131,17 +128,23 @@ void readChatGroup(const string& filename, chatGroup*& groupList, int& g)
 	groupList = new chatGroup[g];
 	string line;
 	getline(infile,line);
+	string name;
+	int size;
 
 	for (int i=0;i<g;i++){
 		getline(infile,line);
-		infile >> groupList[i].groupName >>groupList[i].size;
+		infile >> name >>size;
+		groupList[i].groupName = name;
+		groupList[i].size = size;
 		getline(infile,line);
-		for(int j=0;j<groupList[i].size;j++){
+		for(int j=0;j<size;j++){
 			getline(infile,line);
+			int length = line.length();
+			groupList[i].member[j] = line.substr(0,length);
 		}
 	}
 	// Your codes
-
+	infile.close();
 }
 
 const string& getNameByTel(const telRec *telList, int n, const string& tel)
@@ -157,17 +160,21 @@ const string& getNameByTel(const telRec *telList, int n, const string& tel)
 	int a=0;
 	int b=n-1;
 	int c=(a+b)/2;
-	while(telList[c].tel!=tel){
-		if(telList[c].tel>tel){
-			b=c;
-			c=(a+b)/2;
+	string backward = NotFound;
+	while (a <= b) {
+		if (telList[c].tel == tel) {
+			backward = telList[c].name;
+			break;
 		}
-		else
-			a=c;
-			c=(a+b)/2;
-	}
-	if(telList[c].tel==tel){
-		return telList[c].tel;
+		else if (telList[c].tel < tel) {
+			a = c;
+			c = (a + b) / 2;
+		}
+		else{
+			b = c;
+			c = (a + b) / 2;
+		}
+		
 	}
 
 	// Your codes
@@ -191,24 +198,27 @@ void printChatGroupByName(const chatGroup *groupList, int g, string gname, const
 	int a=0;
 	int b=g-1;
 	int c=(a+b)/2;
-	while (groupList[c].groupName!=gname){
-		if (groupList[c].groupName<gname){
-			a=c;
-			c=(a+b)/2;
+	while (a <= b) {
+		if (groupList[c].groupName == gname) {
+			cout << "Chat group : " << groupList[c].groupName << endl;
+			cout << "Number of members : " << groupList[c].size << endl;
+			for (int i = 0; i < groupList[c].size; i++) {
+				cout << getNameByTel(telList, n, groupList[c].member[i]) << ", " << groupList[c].member[i] << endl;
+			}
+			break;
 		}
-		else
-			b=c;
-			c=(a+b)/2;
-	}
-	if (groupList[c].groupName==gname){
-		cout<<"Chat group : "<<groupList[c].groupName<<endl;
-		cout<<"Number of members : "<<groupList[c].size<<endl;
-		for (int i=0;i<groupList[c].size;i++){
-			cout<<getNameByTel(telList, n, groupList[c].member[i])<<", "<<groupList[c].menber[i]<<endl;
+		else if (groupList[c].groupName < gname) {
+			a = c;
+			c = (a + b) / 2;
+		}
+		else {
+			b = c;
+			c = (a + b) / 2;
 		}
 	}
-	else 
-		cout << gname<<" not found"<<endl;
+	if (groupList[c].groupName != gname) {
+		cout << "Chat group : " << gname << " not found" << endl;
+	}
 
 	// Your codes
 }
